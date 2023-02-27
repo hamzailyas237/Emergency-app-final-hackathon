@@ -1,37 +1,43 @@
 
 
-import React from 'react'
+import React, { useState } from 'react'
 import { Text, Card, Button, Icon } from '@rneui/themed';
 import RoundButton from '../button/RoundButton';
 import alertImg from '../../assets/alert.png'
-import { TouchableOpacity } from 'react-native';
+import { ActivityIndicator, TouchableOpacity } from 'react-native';
 import { FormStyles } from '../../styles/Styles';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import Geolocation from '@react-native-community/geolocation';
 
 const RequestCard = ({ request }) => {
 
+    const [loader, setLoader] = useState(false)
+
     const navigation = useNavigation()
     goToLocationScreen = async () => {
-        const captain_latitude = await AsyncStorage.getItem('captain-latitude')
-        const captain_longitude = await AsyncStorage.getItem('captain-longitude')
-        const token = await AsyncStorage.getItem('token')
-        
-        console.log(captain_latitude, captain_longitude);
-        navigation.navigate('Location', { captain_latitude, captain_longitude })
+        setLoader(true)
 
-        axios.delete(`https://ruby-long-salamander.cyclic.app/api/request/${request._id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        })
-        .then(res => {
-            console.log(res.data);
-        })
-        .catch(err => {
-            console.log(err);
-        })
+        const token = await AsyncStorage.getItem('token')
+
+        Geolocation.getCurrentPosition((async (data) => {
+            await axios.delete(`https://ruby-long-salamander.cyclic.app/api/request/${request._id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            })
+                .then(res => {
+                    setLoader(false)
+                    navigation.navigate('Location', { captainLatitude: data.coords.latitude, captainLongitude: data.coords.longitude })
+                })
+                .catch(err => {
+                    setLoader(false)
+                    console.log(err);
+                })
+        }));
+
+
     }
     return (
         <Card>
@@ -56,7 +62,13 @@ const RequestCard = ({ request }) => {
             </Text>
             <TouchableOpacity style={[FormStyles.buttonContainer, FormStyles.shadow]}
                 onPress={goToLocationScreen}>
-                <Text style={FormStyles.buttonStyle}>Accept</Text>
+                <Text style={FormStyles.buttonStyle}>
+                    {loader ?
+                        <ActivityIndicator color={'white'} />
+                        :
+                        'Accept'
+                    }
+                </Text>
             </TouchableOpacity>
         </Card>
     )

@@ -1,12 +1,12 @@
 
 
 import React, { useEffect, useState } from 'react'
-import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'
 import { FormStyles } from '../../styles/Styles'
 import axios from 'axios'
 import Toast from 'react-native-toast-message';
 import RoundedInput from '../../components/input/RoundedInput';
-
+import { Dropdown } from 'react-native-element-dropdown';
 
 const Signup = ({ navigation }) => {
 
@@ -16,18 +16,22 @@ const Signup = ({ navigation }) => {
     const [phone, setPhone] = useState('')
     const [password, setPassword] = useState('')
     const [response, setResponse] = useState(false)
-
+    const [value, setValue] = useState('');
+    const data = [
+        { label: 'User', value: '1' },
+        { label: 'Ambulance, Fire brigade, Police', value: '2' },
+    ];
 
     const signupHandler = () => {
         const loginUserResponse = axios.post('https://ruby-long-salamander.cyclic.app/api/signup', {
             name,
             email,
             password,
-            phone
+            phone,
+            role: value
         })
-            .then(res => {
-                console.log(res.data);
-                navigation.navigate('Splash')
+            .then(async (res) => {
+                // navigation.navigate('Login')
                 setResponse(false)
             })
             .catch(err => {
@@ -43,11 +47,18 @@ const Signup = ({ navigation }) => {
         const checkResponse = async () => {
             setResponse(true)
             await loginUserResponse
+            setName('')
+            setEmail('')
+            setPhone('')
+            setValue('')
+            setPassword('')
         }
         checkResponse()
     }
 
+
     return (
+
         <ScrollView>
             <View style={FormStyles.mainContainer}>
 
@@ -61,34 +72,44 @@ const Signup = ({ navigation }) => {
                     <View style={[FormStyles.inputContainer]}>
                         <Text style={FormStyles.mainHeading}>Sign up</Text>
 
-
                         <RoundedInput
                             style={[FormStyles.inputStyle, FormStyles.shadow]}
                             placeholder='user name'
                             onChangeText={(e) => setName(e)}
+                            value={name}
                         />
                         <RoundedInput
                             style={[FormStyles.inputStyle, FormStyles.shadow]}
                             keyboardType="email-address"
                             placeholder='email@address.com'
                             onChangeText={(e) => setEmail(e)}
+                            value={email}
                         />
                         <RoundedInput
                             style={[FormStyles.inputStyle, FormStyles.shadow]}
                             keyboardType='numeric'
                             placeholder='phone'
                             onChangeText={(e) => setPhone(e)}
+                            value={phone}
                         />
-                        <RoundedInput
-                            style={[FormStyles.inputStyle, FormStyles.shadow]}
-                            placeholder='Your role ? Admin OR User'
-                            onChangeText={(e) => setPhone(e)}
+                        <Dropdown
+                            style={[FormStyles.inputStyle, FormStyles.shadow, styles.dropdown]}
+                            data={data}
+                            maxHeight={150}
+                            labelField="label"
+                            valueField="value"
+                            placeholder="Select role"
+                            value={value}
+                            onChange={item => {
+                                setValue(item.label);
+                            }}
                         />
                         <RoundedInput
                             style={[FormStyles.inputStyle, FormStyles.shadow]}
                             secureTextEntry={true}
                             placeholder='Passowrd'
                             onChangeText={(e) => setPassword(e)}
+                            value={password}
                         />
                     </View>
 
@@ -127,7 +148,7 @@ const Signup = ({ navigation }) => {
 
 
             </View >
-        </ScrollView>
+        </ScrollView >
 
     )
 }
@@ -135,3 +156,9 @@ const Signup = ({ navigation }) => {
 export default Signup
 
 
+const styles = StyleSheet.create({
+    dropdown: {
+        height: 50,
+        padding: 12,
+    },
+});

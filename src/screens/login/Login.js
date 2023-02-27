@@ -43,6 +43,8 @@ const Login = ({ navigation }) => {
         const checkResponse = async () => {
             setResponse(true)
             await loginUserResponse
+            setEmail('')
+            setPassword('')
         }
         checkResponse()
 
@@ -68,12 +70,14 @@ const Login = ({ navigation }) => {
                             keyboardType="email-address"
                             placeholder='email@address.com'
                             onChangeText={(e) => setEmail(e)}
+                            value={email}
                         />
                         <RoundedInput
                             style={[FormStyles.inputStyle, FormStyles.shadow]}
                             secureTextEntry={true}
                             placeholder='Passowrd'
                             onChangeText={(e) => setPassword(e)}
+                            value={password}
                         />
 
 

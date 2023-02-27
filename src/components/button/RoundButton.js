@@ -1,6 +1,6 @@
 
 
-import { View, Text, TouchableOpacity, Alert } from 'react-native'
+import { Text, TouchableOpacity, Alert, ActivityIndicator } from 'react-native'
 import React, { useState } from 'react'
 import { FormStyles } from '../../styles/Styles'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -9,14 +9,16 @@ import Toast from 'react-native-toast-message';
 
 const RoundButton = ({ text }) => {
 
+    const [response, setResponse] = useState(false)
+
     const sendRequest = async () => {
         console.log('request sent');
-        const latitude = await AsyncStorage.getItem('latitude')
-        const longitude = await AsyncStorage.getItem('longitude')
+        const userLatitude = await AsyncStorage.getItem('latitude')
+        const userLongitude = await AsyncStorage.getItem('longitude')
         const id = await AsyncStorage.getItem('id')
         const token = await AsyncStorage.getItem('token')
 
-        const loggedInUser = await axios.get(`https://ruby-long-salamander.cyclic.app/api/user/${id}`, {
+        const loggedInUser = axios.get(`https://ruby-long-salamander.cyclic.app/api/user/${id}`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -27,8 +29,8 @@ const RoundButton = ({ text }) => {
                         name: res.data.user.name,
                         email: res.data.user.email,
                         phone: res.data.user.phone,
-                        latitude,
-                        longitude,
+                        latitude: userLatitude,
+                        longitude: userLongitude,
                         emergency_type: text
                     },
                     {
@@ -37,6 +39,7 @@ const RoundButton = ({ text }) => {
                         }
                     })
                     .then(res => {
+                        setResponse(false)
                         Toast.show({
                             type: 'success',
                             text1: res.data.message,
@@ -45,6 +48,7 @@ const RoundButton = ({ text }) => {
                         });
                     })
                     .catch(err => {
+                        setResponse(false)
                         Toast.show({
                             type: 'error',
                             text1: err.response.data.message,
@@ -55,6 +59,7 @@ const RoundButton = ({ text }) => {
 
             })
             .catch(err => {
+                setResponse(false)
                 Toast.show({
                     type: 'error',
                     text1: err.response.data.message,
@@ -62,10 +67,16 @@ const RoundButton = ({ text }) => {
                     topOffset: 20
                 });
             })
+
+        const checkResponse = async () => {
+            setResponse(true)
+            await loggedInUser
+        }
+        checkResponse()
     }
 
     const request = () => {
-        Alert.alert('Upload Image', 'Take a photo or select from gallery', [
+        Alert.alert('Emergency Request', 'To make an emergency request click on REQUEST', [
             {
                 text: 'Cancel',
                 onPress: () => console.log('Cancel Pressed'),
@@ -76,7 +87,13 @@ const RoundButton = ({ text }) => {
     }
     return (
         <TouchableOpacity style={[FormStyles.buttonContainer, FormStyles.shadow]} onPress={request}>
-            <Text style={FormStyles.buttonStyle}>{text}</Text>
+            <Text style={FormStyles.buttonStyle}>
+                {
+                    !response ? text
+                        :
+                        <ActivityIndicator color={'white'} />
+                }
+            </Text>
         </TouchableOpacity>
     )
 }

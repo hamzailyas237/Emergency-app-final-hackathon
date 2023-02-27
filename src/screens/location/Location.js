@@ -20,19 +20,15 @@ const styles = StyleSheet.create({
 
 export default Location = ({ route }) => {
 
-    const { captain_latitude, captain_longitude } = route.params
+    const { captainLatitude, captainLongitude } = route.params
 
     const [currentLatitude, setCurrentLatitude] = useState('')
     const [currentLongiitude, setCurrentLongiitude] = useState('')
-    const [captainLatitude, setCaptainLatitude] = useState('')
-    const [captainLongitude, setCaptainLongitude] = useState('')
 
     useEffect(() => {
         Geolocation.getCurrentPosition(((data) => {
             setCurrentLatitude(data.coords.latitude)
             setCurrentLongiitude(data.coords.longitude)
-            setCaptainLatitude(data.coords.latitude)
-            setCaptainLongitude(data.coords.longitude)
 
         }));
     }, [])
@@ -61,10 +57,10 @@ export default Location = ({ route }) => {
                 <Polyline
                     coordinates={[
                         { latitude: currentLatitude, longitude: currentLongiitude },
-                        // { latitude: captainLatitude, longitude: captainLongitude },
-                        { latitude: 24.91907761368746, longitude: 67.06355682384475 },
+                        { latitude: captainLatitude, longitude: captainLongitude },
+                        // { latitude: 24.91907761368746, longitude: 67.06355682384475 },
                     ]}
-                    strokeColor="#00B0FF" 
+                    strokeColor="#00B0FF"
                     strokeWidth={6}
                 />
 

@@ -4,7 +4,7 @@ import { StyleSheet } from "react-native";
 export const FormStyles = StyleSheet.create({
     mainContainer: {
         alignItems: 'center',
-        minHeight: 650
+        minHeight: 700
     },
 
     appHeadingContainer: {
@@ -97,8 +97,8 @@ export const styles = StyleSheet.create({
     },
     homeMainText: {
         color: '#499BFD',
-        textAlign:'center',
-        fontWeight:'bold',
-        fontSize:16
+        textAlign: 'center',
+        fontWeight: 'bold',
+        fontSize: 16
     }
 })

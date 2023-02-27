@@ -7,9 +7,10 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import storage from '@react-native-firebase/storage';
 import Toast from 'react-native-toast-message';
 import axios from 'axios';
+import { FormStyles } from '../../styles/Styles';
 
 
-const Profile = () => {
+const Profile = ({ navigation }) => {
 
     const [image, setImage] = useState('')
     const [name, setName] = useState('')
@@ -31,11 +32,11 @@ const Profile = () => {
                 }
             })
                 .then(res => {
-                    setImage(res.data.profile_data.image)
+                    setImage(res.data.profile_data && res.data.profile_data.image)
                     setLoader(false)
                 })
                 .catch(err => {
-                    console.log(err);
+                    console.log('get img', err);
                 })
             await axios.get(`https://ruby-long-salamander.cyclic.app/api/user/${userId}`, {
                 headers: {
@@ -64,7 +65,7 @@ const Profile = () => {
             // Uploading image to firebase Storage
             if (res) {
                 const fileUri = res.assets[0].uri
-                const fileName = fileUri.substring(image.lastIndexOf('/') + 1)
+                const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1)
                 const reference = storage().ref(`Images/Profile Images/${userId}/${fileName}`)
                 await reference.putFile(fileUri)
 
@@ -111,20 +112,18 @@ const Profile = () => {
             // Uploading image to firebase Storage
             if (res) {
                 const fileUri = res.assets[0].uri
-                const fileName = fileUri.substring(image.lastIndexOf('/') + 1)
+                const fileName = fileUri.substring(fileUri.lastIndexOf('/') + 1)
                 const reference = storage().ref(`Images/Profile Images/${userId}/${fileName}`)
                 await reference.putFile(fileUri)
-
                 // Getting image from firebase Storage 
                 const url = await reference.getDownloadURL();
                 setImage(!res.didCancel && url)
-
                 // Pushing gotten image from firebase Storage to server 
                 const obj = {
                     user_id: userId,
                     image: url
                 }
-
+ 
                 await axios.post('https://ruby-long-salamander.cyclic.app/api/profile', obj, {
                     headers: {
                         "Authorization": `Bearer ${token}`
@@ -137,8 +136,9 @@ const Profile = () => {
                             visibilityTime: 2000,
                             topOffset: 20
                         });
-                    })
+                    })          
                     .catch(err => {
+                        console.log(err, 'err');
                         Toast.show({
                             type: 'error',
                             text1: err.response.data.message,
@@ -162,6 +162,13 @@ const Profile = () => {
         ]
         )
     }
+
+
+    const logout = async () => {
+        await AsyncStorage.clear()
+        navigation.navigate('Login')
+    }
+
     return (
 
 
@@ -189,6 +196,9 @@ const Profile = () => {
                 </View>
 
             }
+            <TouchableOpacity style={[FormStyles.buttonContainer, FormStyles.shadow]} >
+                <Text style={FormStyles.buttonStyle} onPress={logout}>Logout</Text>
+            </TouchableOpacity>
         </View >
 
 
