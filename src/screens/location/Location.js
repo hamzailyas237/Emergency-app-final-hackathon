@@ -29,7 +29,6 @@ export default Location = ({ route }) => {
         Geolocation.getCurrentPosition(((data) => {
             setCurrentLatitude(data.coords.latitude)
             setCurrentLongiitude(data.coords.longitude)
-
         }));
     }, [])
 

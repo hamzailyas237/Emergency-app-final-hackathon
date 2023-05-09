@@ -13,6 +13,8 @@ import ServiceCard from '../../components/card/ServiceCard'
 import ambulance from '../../assets/ambulance.png'
 import police from '../../assets/police.png'
 import firebrigade from '../../assets/firebrigade.png'
+import Geolocation from '@react-native-community/geolocation';
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const Home = ({ navigation }) => {
 
@@ -30,6 +32,13 @@ const Home = ({ navigation }) => {
   const navigateToFirebrigadeScreen = () => {
     navigation.navigate('Firebrigade')
   }
+
+  useEffect(() => {
+    Geolocation.getCurrentPosition(((data) => {
+        AsyncStorage.setItem('latitude', data.coords.latitude.toString())
+        AsyncStorage.setItem('longitude', data.coords.longitude.toString())
+    }));
+}, [])
 
   return (
 

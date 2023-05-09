@@ -48,6 +48,7 @@ const RoundButton = ({ text }) => {
                         });
                     })
                     .catch(err => {
+                        console.log('err 1 err 1')
                         setResponse(false)
                         Toast.show({
                             type: 'error',
@@ -59,6 +60,7 @@ const RoundButton = ({ text }) => {
 
             })
             .catch(err => {
+                console.log('err 2 err 2')
                 setResponse(false)
                 Toast.show({
                     type: 'error',
